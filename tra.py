@@ -1,14 +1,23 @@
 #-*- coding:utf-8 -*-
 import requests
-
 import pandas as pd
-import numpy as np
 
 from lxml import etree
 
+try:
+    from . import stationid
+except Exception as e:
+    import stationid
 
-def get_tra_data():
-    url = 'https://www.railway.gov.tw/tw/CP.aspx?sn=3611'
+
+TRA_miles = 'https://www.railway.gov.tw/tw/CP.aspx?sn=3611'
+
+
+def get_tra_data(url=TRA_miles):
+    """crawler station miles from TRA web 
+    types: url: str
+    rtypes: cols: list in list
+    """
     r = requests.get(url)
     html = etree.HTML(r.text)
     parser = '//*[@id="Table7"]/tbody/tr'
@@ -18,15 +27,14 @@ def get_tra_data():
     for i in range(1, len(root)):  # total 28 elements
         rows = []
         if i == 1:
-            parser_sub = '{}[{}]/th'.format(parser, i)
+            parser_sub = f'{parser}[{i}]/th'
         else:
-            parser_sub = '{}[{}]/td'.format(parser, i)
+            parser_sub = f'{parser}[{i}]/td'
         sub = html.xpath(parser_sub)
-
         for j in range(1, len(sub) + 1):  # each element has 8 fields
             row = html.xpath('{}[{}]'.format(parser_sub, j))[0].text
             if type(row) is str:
-                row = row.strip()  # 去除字符串兩邊的空格
+                row = row.strip()  # remove str both side empty or \r\n
                 if row == '':
                     try:  # 南樹林多了 tag <p></p>
                         rowp = html.xpath(
@@ -40,7 +48,7 @@ def get_tra_data():
                 rows.append(row)
             # if row is <class 'NoneType'> type(row) == None
             # 竟然不成立？似乎是不考慮繼承關係造成
-            elif isinstance(row, type(None)):
+            elif isinstance(row, type(None)):  # 嘉北多了 tag <span></span>
                 row = html.xpath('{}[{}]/span'.format(parser_sub, j))[0].text
                 row = row.strip()
                 rows.append(row)
@@ -51,8 +59,12 @@ def get_tra_data():
 
 
 def convert(datas=None):
+    """conver raw data from TRA web to dict
+    types: datas: list in list
+    rtypes: res: dict
+    """
     if datas is None:
-        datas = {}
+        datas = []
 
     res = dict()
     for i in range(1, len(datas)):  # remove header
@@ -69,6 +81,12 @@ def convert(datas=None):
 
 
 def caculate(start, end, datas):
+    """caculate miles with different stations
+    types: start: string
+    types: end: string
+    types: datas: dict
+    rtypes: way_long: float
+    """
     if not isinstance(start, str):
         raise Exception(f"'start:{type(start)}', Invalid Input")
     if not isinstance(end, str):
@@ -77,6 +95,11 @@ def caculate(start, end, datas):
     way_long = abs(datas.get(start) - datas.get(end))
 
     return way_long
+
+
+def caculate_price():
+    """caculate different stations prices by api
+    """
 
 
 if __name__ == '__main__':
