@@ -7,12 +7,13 @@ from requests.auth import HTTPBasicAuth
 from lxml import etree
 
 try:
-    from .make_hmac import *
+    from .make_hmac import *  # create_hmac, base64_digest
 except Exception as e:
-    from make_hmac import *
+    from make_hmac import *  # create_hmac, base64_digest
 
 
 TRA_miles = 'https://www.railway.gov.tw/tw/CP.aspx?sn=3611'
+PTX_url = 'http://ptx.transportdata.tw/MOTC'
 
 
 def get_tra_data(url=TRA_miles):
@@ -76,6 +77,7 @@ def convert(datas=None):
             if j % 2 != 0 and datas[i][j - 1] != '':
                 res.setdefault(datas[i][j - 1], float(datas[i][j]))
 
+    # sort by station's kill
     res = sorted(res.items(), key=lambda x: x[1])
     res = dict(res)
 
@@ -94,6 +96,7 @@ def caculate(start, end, datas):
     if not isinstance(end, str):
         raise Exception(f"'start:{type(end)}', Invalid Input")
 
+    # price should be abs
     way_long = abs(datas.get(start) - datas.get(end))
 
     return way_long
@@ -108,15 +111,17 @@ def get_tra_price(OriginStation, DestinationStation):
     OriginStationID = stationid_dict.get(OriginStation)[0]
     DestinationStationID = stationid_dict.get(DestinationStation)[0]
 
+    # Here get HMAC object for authorization
     auth = create_hmac(secretkey=AppKey, message=message)
     signature = base64_digest(auth=auth)
     authorization = f'hmac username="{AppID}", algorithm="hmac-sha1", headers="x-date", signature="{signature}"'
+    
+    # use requests module to communication with PTX's api
     headers = {
         'Authorization': authorization,
         'x-date': x_date
     }
-
-    resource = f'http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/ODFare/{OriginStationID}/to/{DestinationStationID}?$top=30&$format=JSON'
+    resource = f'{PTX_url}/v2/Rail/TRA/ODFare/{OriginStationID}/to/{DestinationStationID}?$top=30&$format=JSON'
     r = requests.get(resource, headers=headers)
     return r
 
@@ -126,6 +131,6 @@ if __name__ == '__main__':
     #c = convert(datas=datas)
     # c = convert()
     #print(c, list(c.keys()))
-    p = get_tra_price(OriginStation='基隆', DestinationStation='新左營')
-    print(p.text)
+    #p = get_tra_price(OriginStation='基隆', DestinationStation='新左營')
+    #print(p.status_code)
 
