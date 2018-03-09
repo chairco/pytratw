@@ -16,6 +16,8 @@
 ## 資料來源與 API
 
 + [各站的營業里程](https://www.railway.gov.tw/tw/CP.aspx?sn=3611)
++ [台鐵七十公里里程](https://www.railway.gov.tw/tw/Kilometer.aspx?n=20998)
++ [台鐵電子票證價格說明](https://www.railway.gov.tw/tw/CP.aspx?sn=1312)
 + [公共運輸整合資料平台](https://ptx.transportdata.tw/PTX/Service?Transportation=%E8%87%BA%E9%90%B5)
 
 
@@ -23,4 +25,4 @@
 
 + 資料取得模組
 + 規劃路徑以及查詢里程
-+ 計算價格
++ 計算票價格
