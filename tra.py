@@ -2,12 +2,14 @@
 import requests
 import pandas as pd
 
+from datetime import datetime
+from requests.auth import HTTPBasicAuth
 from lxml import etree
 
 try:
-    from . import stationid
+    from .make_hmac import *
 except Exception as e:
-    import stationid
+    from make_hmac import *
 
 
 TRA_miles = 'https://www.railway.gov.tw/tw/CP.aspx?sn=3611'
@@ -97,13 +99,33 @@ def caculate(start, end, datas):
     return way_long
 
 
-def caculate_price():
+def get_tra_price(OriginStation, DestinationStation):
     """caculate different stations prices by api
+    types: OriginStation: str
+    types: DestinationStation: str
+    rtypes: r: json
     """
+    OriginStationID = stationid_dict.get(OriginStation)[0]
+    DestinationStationID = stationid_dict.get(DestinationStation)[0]
+
+    auth = create_hmac(secretkey=AppKey, message=message)
+    signature = base64_digest(auth=auth)
+    authorization = f'hmac username="{AppID}", algorithm="hmac-sha1", headers="x-date", signature="{signature}"'
+    headers = {
+        'Authorization': authorization,
+        'x-date': x_date
+    }
+
+    resource = f'http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/ODFare/{OriginStationID}/to/{DestinationStationID}?$top=30&$format=JSON'
+    r = requests.get(resource, headers=headers)
+    return r
 
 
 if __name__ == '__main__':
-    datas = get_tra_data()
-    c = convert(datas=datas)
+    #datas = get_tra_data()
+    #c = convert(datas=datas)
     # c = convert()
-    print(c, list(c.keys()))
+    #print(c, list(c.keys()))
+    p = get_tra_price(OriginStation='基隆', DestinationStation='新左營')
+    print(p.text)
+
