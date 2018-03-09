@@ -33,6 +33,7 @@ class TestTRA(unittest.TestCase):
         self.convert = tra.convert(datas=self.datas)
         self.ntos = tra.caculate(start='基隆', end='新左營', datas=self.convert)
         self.ston = tra.caculate(start='新左營', end='基隆', datas=self.convert)
+        self.price = tra.get_tra_price(OriginStation='基隆', DestinationStation='新左營')
 
     def tearDown(self):
         self.log('tearDownnvoked.')
@@ -50,7 +51,24 @@ class TestTRA(unittest.TestCase):
         # West's station count
         self.assertEqual(len(self.convert.keys()), 96)
         self.assertEqual(list(self.convert.keys()), west_stations)
-        
+
+    def test_get_tra_price(self):
+        self.assertEqual(self.price.status_code, 200)
+
+
+class TestPTX(unittest.TestCase):
+
+    def log(self, msg):
+        objid = hex(id(self))
+        print(f"<<{objid}>>: {msg} -- {self._testMethodName}")
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        self.log('tearDownnvoked.')
+
+
 
 if __name__ == '__main__':
     unittest.main()
