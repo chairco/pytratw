@@ -19,6 +19,7 @@
 + [台鐵七十公里里程](https://www.railway.gov.tw/tw/Kilometer.aspx?n=20998)
 + [台鐵電子票證價格說明](https://www.railway.gov.tw/tw/CP.aspx?sn=1312)
 + [公共運輸整合資料平台](https://ptx.transportdata.tw/PTX/Service?Transportation=%E8%87%BA%E9%90%B5)
++ [PTX API 文件](https://gist.github.com/ptxmotc/383118204ecf7192bdf96bc0197bb981)
 
 
 ## 開發模組
