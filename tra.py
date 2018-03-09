@@ -82,4 +82,5 @@ def caculate(start, end, datas):
 if __name__ == '__main__':
     datas = get_tra_data()
     c = convert(datas=datas)
-    print(c, c.keys())
+    # c = convert()
+    print(c, list(c.keys()))
