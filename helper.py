@@ -90,11 +90,10 @@ def get_senven_km(headers: Dict) -> Dict:
     return stations_dict
 
 
-def get_prices(start: str, end: str, headers: Dict) -> Dict:
+def get_prices(start: str, end: str, headers: Dict) -> int:
     """
     headers: Dict: browser post requests's headers
     """
-    print(start, end)
     url = 'https://www.railway.gov.tw/tra-tip-web/tip/tip001/tip114/query'
     p = '//*[@id="queryBlock"]/input'
 
@@ -108,16 +107,19 @@ def get_prices(start: str, end: str, headers: Dict) -> Dict:
         'tip114QueryVOs[0].endStation': end,
         'tip114QueryVOs[0].trainType': '6',
         'tip114QueryVOs[0].ticketPriceType': '1',
-        'tip114QueryVOs[0].ticketCount': '1'
+        'tip114QueryVOs[0].ticketCount': '1',
+        'query': '' 
     }
 
-    return data
-
-
-if __name__ == '__main__':
-    from pprint import pprint
+    res = client.post(url, headers=headers, data=data)
+    p = '//*[@id="content"]/div[4]/table/tr[2]/td[7]/span[1]//text()'
     
-    pprint(get_senven_km(headers=headers))
-    #print(get_prices(start='4340-新左營', end='3470-斗六', headers=headers))
+    parser = etree.HTMLParser(encoding="utf-8")
+    html = etree.HTML(res.text, parser=parser)
+    prices = html.xpath(p)[0] if len(html.xpath(p)) == 1 else None
+    return prices
 
 
+if __name__ == '__main__':    
+    print(get_senven_km(headers=headers))
+    print(get_prices(start='4340-新左營', end='3470-斗六', headers=headers))
