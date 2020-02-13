@@ -27,6 +27,9 @@ headers = {
 
 def get_csrf(client, url, p, headers) -> str:
     """
+    client: session: session
+    url: str: target url
+    p: str: xpath
     headers: Dict: browser post requests's headers
     """
     r = client.get(url)
@@ -92,7 +95,10 @@ def get_senven_km(headers: Dict) -> Dict:
 
 def get_prices(start: str, end: str, headers: Dict) -> int:
     """
+    start: str: start's station
+    end: str: end's station
     headers: Dict: browser post requests's headers
+    ticket type: (ONCE,3), (ELECTRONIC_TICKET,1)
     """
     url = 'https://www.railway.gov.tw/tra-tip-web/tip/tip001/tip114/query'
     p = '//*[@id="queryBlock"]/input'
